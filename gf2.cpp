@@ -27,6 +27,8 @@
 #ifdef __APPLE__
 #include <sys/syslimits.h>
 #define UI_COCOA
+#elif defined(USE_WAYLAND)
+#define UI_WAYLAND
 #else
 #define UI_LINUX
 #endif
@@ -34,7 +36,7 @@
 extern "C" {
 #define UI_FONT_PATH
 #define UI_IMPLEMENTATION
-#include "luigi2.h"
+#include "ui/luigi2.h"
 }
 
 // Data structures:

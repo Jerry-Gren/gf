@@ -13,4 +13,11 @@ else printf "\033[0;31mWarning\033[0m: FreeType could not be found. The fallback
 uname -m | grep x86_64 > /dev/null && extra_flags="$extra_flags -DUI_SSE2"
 
 # Build the executable.
-g++ gf2.cpp -o gf2 -g -O2 -lX11 -pthread $extra_flags -Wall -Wextra -Wno-unused-parameter -Wno-unused-result -Wno-missing-field-initializers -Wno-format-truncation || exit 1
+if [ "$1" = "wayland" ]; then
+    command -v wayland-scanner > /dev/null 2>&1 || { echo >&2 "Error: wayland-scanner is required but not installed. Aborting."; exit 1; }
+    wayland-scanner client-header /usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml xdg-shell-client-protocol.h
+    wayland-scanner private-code /usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml xdg-shell-protocol.c
+    g++ gf2.cpp -o gf2 -g -O2 -DUSE_WAYLAND -lwayland-client -lwayland-cursor -lxkbcommon -pthread $extra_flags -Wall -Wextra -Wno-unused-parameter -Wno-unused-result -Wno-missing-field-initializers -Wno-format-truncation || exit 1
+else
+    g++ gf2.cpp -o gf2 -g -O2 -lX11 -pthread $extra_flags -Wall -Wextra -Wno-unused-parameter -Wno-unused-result -Wno-missing-field-initializers -Wno-format-truncation || exit 1
+fi
